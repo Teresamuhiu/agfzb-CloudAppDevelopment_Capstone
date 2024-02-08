@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dealership Review</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
@@ -72,7 +73,6 @@
         footer p {
             margin: 0;
         }
-
         .navbar-brand:hover,
         .nav-link:hover {
             color: #ffc107; /* Yellow on hover */
@@ -89,23 +89,20 @@
             border-color: #218838; /* Darker Green on hover */
         }
     </style>
-
 </head>
-
-    <body>
-    <!-- Remove this line the first time you edit this file -->
-    <!--Add a nav bar here -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+<body>
+        <!--Add a nav bar here -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <a class="navbar-brand" href="{% url 'djangoapp:index' %}">Car Dealership</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item active">
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'djangoapp:index' %}">Home <span class="sr-only">(current)</span></a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item active">
                         <a class="nav-link" href="{% url 'djangoapp:about' %}">About</a>
                     </li>
                     <li class="nav-item">
@@ -115,14 +112,10 @@
                 </ul>
             </div>
     </nav>
-
     <div class="container">
-        <h1>Welcome to the Car Dealership Website</h1>
-        <p>Here you can access customer reviews on car dealerships across the USA.</p>
+        <h1>Welcome to Best Cars Dealership</h1>
+        <p>Home to the best cars in North America. We sell domestic and imported cars at reasonable prices.</p>
+        <!-- Add additional information here -->
     </div>
-
-    <!--Add a dealer table here -->
-
-    </body>
-
+</body>
 </html>
