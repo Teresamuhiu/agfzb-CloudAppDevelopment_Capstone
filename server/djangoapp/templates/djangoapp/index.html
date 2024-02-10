@@ -112,6 +112,28 @@
                         <a class="nav-link" href="{% url 'djangoapp:contact' %}">Contact Us</a>
                     </li>
                     <!-- Add more navigation links as needed -->
+                    {% if user.is_authenticated %}
+                    <!-- Display user's first name or username if authenticated -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Welcome, {{ user.first_name|default:user.username }}</a>
+                    </li>
+                    <!-- Add signout submission button/link pointing to signout view -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'djangoapp:logout' %}">Logout</a>
+                    </li>
+                    {% else %}
+                    <!-- Display login form if user is not authenticated -->
+                    <form class="form-inline" method="post" action="{% url 'djangoapp:login' %}">
+                        {% csrf_token %}
+                        <input class="form-control mr-sm-2" type="text" placeholder="Username" name="username">
+                        <input class="form-control mr-sm-2" type="password" placeholder="Password" name="password">
+                        <button class="btn btn-primary my-2 my-sm-0" type="submit">Login</button>
+                    </form>
+                    <!-- Add signup link/button pointing to signup view -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'djangoapp:signup' %}">Sign Up</a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
     </nav>
