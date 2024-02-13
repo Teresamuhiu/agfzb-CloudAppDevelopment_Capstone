@@ -6,6 +6,7 @@ from django.urls import reverse
 # from .models import related models
 # from .restapis import related methods
 from .restapis import get_dealers_from_cf
+from .restapis import post_request
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
@@ -94,7 +95,7 @@ def get_dealerships(request):
 def get_dealer_details(request, dealer_id):
     # API key for Watson NLU service
     api_key = "NpjYIT4_ZFHVWNxKc88lKFutCSOW5_HRLjd_ZMZNdg3l"
-    
+
     # Call get_dealer_reviews_from_cf to get reviews for the specified dealer_id
     dealer_reviews = get_dealer_reviews_from_cf(dealer_id, api_key)
 
@@ -115,4 +116,34 @@ def get_dealer_details(request, dealer_id):
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 # ...
+def add_review(request, dealer_id):
+    # Check if the user is authenticated
+    if not request.user.is_authenticated:
+        return HttpResponse("User is not authenticated. Please log in to post a review.")
+
+    # Create a dictionary object for the review
+    review = {
+        "time": datetime.utcnow().isoformat(),
+        "dealership": dealer_id,
+        "review": "This is a great car dealer"  # Example review text
+    }
+
+    # Create a JSON payload with the review
+    json_payload = {"review": review}
+
+    # URL for posting the review 
+    url = "https://muhiutw9-5000.theiadockernext-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/post_review"
+
+    # Call the post_request method with the payload
+    post_response = post_request(url, json_payload, dealerId=dealer_id)
+
+    # Check if the post request was successful
+    if post_response:
+        # Print the post response in the console
+        print("Post Response:", post_response)
+        # You can also return the post response as part of the HTTP response
+        return HttpResponse("Review successfully posted.")
+    else:
+        return HttpResponse("Failed to post the review. Please try again later.")
+
 
