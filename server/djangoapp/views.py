@@ -92,8 +92,15 @@ def get_dealerships(request):
 # def get_dealer_details(request, dealer_id):
 # ...
 def get_dealer_details(request, dealer_id):
+    # API key for Watson NLU service
+    api_key = "NpjYIT4_ZFHVWNxKc88lKFutCSOW5_HRLjd_ZMZNdg3l"
+    
     # Call get_dealer_reviews_from_cf to get reviews for the specified dealer_id
-    dealer_reviews = get_dealer_reviews_from_cf(dealer_id)
+    dealer_reviews = get_dealer_reviews_from_cf(dealer_id, api_key)
+
+     # Process sentiment analysis for each review
+    for review in dealer_reviews:
+        review.sentiment = analyze_review_sentiments(review.review, api_key)
 
    #Build a context dictionary to pass data to the template
     context = {

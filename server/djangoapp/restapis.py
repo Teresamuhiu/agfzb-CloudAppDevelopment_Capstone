@@ -64,6 +64,28 @@ def get_dealers_from_cf(url, **kwargs):
     return dealers
 
 
+# Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
+# def analyze_review_sentiments(text):
+# - Call get_request() with specified arguments
+# - Get the returned sentiment label such as Positive or Negative
+
+def analyze_review_sentiments(text, api_key):
+    url = "https://76466da7-2ceb-43bd-b5ca-6905ea29a608-bluemix.cloudantnosqldb.appdomain.cloud"
+    params = {
+        "text": text,
+        "features": {"sentiment": {}},
+        "return_analyzed_text": True
+    }
+
+    response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
+                            auth=HTTPBasicAuth('apikey', api_key))
+
+    if response.status_code == 200:
+        return response.json().get("sentiment", {}).get("document", {}).get("label", "Unknown")
+    else:
+        return "Unknown"
+
+
 
 # Create a get_dealer_reviews_from_cf method to get reviews by dealer id from a cloud function
 # def get_dealer_by_id_from_cf(url, dealerId):
@@ -72,7 +94,7 @@ def get_dealers_from_cf(url, **kwargs):
 def get_dealer_reviews_from_cf(dealer_id):
     url = "https://muhiutw9-5000.theiadockernext-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/get_reviews?id=13"
     # Call get_request method to fetch data
-    json_result = get_request(url, dealerId=dealer_id)
+    json_result = get_request(url, dealerId=dealer_id, api_key=api_key)
 
     dealer_reviews = []
     # Parse JSON result and create DealerReview objects
@@ -88,18 +110,12 @@ def get_dealer_reviews_from_cf(dealer_id):
                 car_make=review_json.get("car_make", ""),
                 car_model=review_json.get("car_model", ""),
                 car_year=review_json.get("car_year", ""),
-                sentiment=review_json.get("sentiment", ""),
+                sentiment=analyze_review_sentiments(review_json.get("review", ""), api_key),
                 id=review_json.get("id", "")
             )
             dealer_reviews.append(dealer_review)
 
     return dealer_reviews
-
-
-# Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
-# def analyze_review_sentiments(text):
-# - Call get_request() with specified arguments
-# - Get the returned sentiment label such as Positive or Negative
 
 
 
