@@ -111,8 +111,7 @@ def get_dealer_details(request, dealer_id):
     }
 
     # Return an HTTP response with the context data
-    reviews_text = '\n'.join([f'Review: {review}' for review in dealer_reviews])
-    return HttpResponse(reviews_text)
+    return render(request, 'djangoapp/dealer_details.html', context)
 
 
 # Create a `add_review` view to submit a review
@@ -121,31 +120,54 @@ def get_dealer_details(request, dealer_id):
 def add_review(request, dealer_id):
     # Check if the user is authenticated
     if not request.user.is_authenticated:
-        return HttpResponse("User is not authenticated. Please log in to post a review.")
+        return HttpResponse("User is not authenticated. Please login to post a review.")
 
-    # Create a dictionary object for the review
-    review = {
-        "time": datetime.utcnow().isoformat(),
-        "dealership": dealer_id,
-        "review": "This is a great car dealer"  # Example review text
-    }
+    if request.method == 'GET':
+        # Query cars with the dealer id to be reviewed
+        cars = get_dealers_from_cf(dealer_id)
 
-    # Create a JSON payload with the review
-    json_payload = {"review": review}
+        context = {
+            'cars': cars,
+        }
 
-    # URL for posting the review 
-    url = "https://muhiutw9-5000.theiadockernext-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/post_review"
+        return render(request, 'djangoapp/add_review.html', context)
 
-    # Call the post_request method with the payload
-    post_response = post_request(url, json_payload, dealerId=dealer_id)
+    elif request.method == 'POST':
+        # Obtain form data
+        content = request.POST.get('content')
+        purchasecheck = request.POST.get('purchasecheck')
+        car_id = request.POST.get('car')
+        purchasedate = request.POST.get('purchasedate')
 
-    # Check if the post request was successful
-    if post_response:
-        # Print the post response in the console
-        print("Post Response:", post_response)
-        # You can also return the post response as part of the HTTP response
-        return HttpResponse("Review successfully posted.")
-    else:
-        return HttpResponse("Failed to post the review. Please try again later.")
+        # Format review time
+        review_time = datetime.utcnow().isoformat()
 
+        # Get year from purchasedate
+        purchase_year = datetime.strptime(purchasedate, '%m/%d/%Y').strftime('%Y')
 
+        # Create a dictionary object for the review
+        review = {
+            "time": review_time,
+            "dealership": dealer_id,
+            "review": content,
+            "purchase": True if purchasecheck else False,
+            "car_make": "",  # Populate with actual car make
+            "car_model": "",  # Populate with actual car model
+            "car_year": purchase_year,
+        }
+
+        # Create a JSON payload with the review
+        json_payload = {"review": review}
+
+        # URL for posting the review
+        url = "https://muhiutw9-5000.theiadockernext-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/post_review"
+
+        # Call the post_request method with the payload
+        post_response = post_request(url, json_payload, dealerId=dealer_id)
+
+        # Check if the post request was successful
+        if post_response:
+            # Redirect user to the dealer details page
+            return redirect(reverse("djangoapp:dealer_details", kwargs={'dealer_id': dealer_id}))
+        else:
+            return HttpResponse("Failed to post the review. Try again later.")

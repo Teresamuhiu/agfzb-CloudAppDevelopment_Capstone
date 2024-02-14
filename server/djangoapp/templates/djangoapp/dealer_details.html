@@ -10,8 +10,81 @@
     <body>
 
     <!--Add a nav bar here -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="{% url 'djangoapp:index' %}">Car Dealership</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'djangoapp:index' %}">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'djangoapp:about' %}">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'djangoapp:contact' %}">Contact Us</a>
+                </li>
+                <!-- Add more navigation links as needed -->
+                {% if user.is_authenticated %}
+                <!-- Add a link to add review page -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'djangoapp:add_review' dealer_id %}">Add Review</a>
+                </li>
+                {% endif %}
+                <!-- Display user's first name or username if authenticated -->
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Welcome, {{ user.first_name|default:user.username }}</a>
+                </li>
+                <!-- Add signout submission button/link pointing to signout view -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'djangoapp:logout' %}">Logout</a>
+                </li>
+                {% else %}
+                <!-- Display login form if user is not authenticated -->
+                <form class="form-inline" method="post" action="{% url 'djangoapp:login' %}">
+                    {% csrf_token %}
+                    <input class="form-control mr-sm-2" type="text" placeholder="Username" name="username">
+                    <input class="form-control mr-sm-2" type="password" placeholder="Password" name="password">
+                    <button class="btn btn-primary my-2 my-sm-0" type="submit">Login</button>
+                </form>
+                <!-- Add signup link/button pointing to signup view -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'djangoapp:signup' %}">Sign Up</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+</nav>
 
     <!-- Add reviews as cards -->
+    <div class="container">
+        <h1>Dealer Details</h1>
+        <h2>Reviews</h2>
+        <!-- Card Columns for Reviews -->
+        <div class="card-columns">
+            <!-- Iterate over reviews and create cards for each review -->
+            {% for review in dealer_reviews %}
+            <div class="card">
+                <!-- Visualize sentiment using emoji images -->
+                {% if review.sentiment == "positive" %}
+                    <img class="card-img-top" src="{% static 'emoji/positive.png' %}" alt="Positive Sentiment">
+                {% elif review.sentiment == "neutral" %}
+                    <img class="card-img-top" src="{% static 'emoji/neutral.png' %}" alt="Neutral Sentiment">
+                {% else %}
+                    <img class="card-img-top" src="{% static 'emoji/negative.png' %}" alt="Negative Sentiment">
+                {% endif %}
+                <div class="card-body">
+                    <!-- Car Model, Make, Purchase Year -->
+                    <h5 class="card-title">{{ review.car_model }} - {{ review.car_make }} ({{ review.car_year }})</h5>
+                    <!-- Review Content -->
+                    <p class="card-text">{{ review.review }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>    
 
     </body>
 
